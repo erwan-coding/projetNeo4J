@@ -1,0 +1,30 @@
+neo4j-admin import --database=graph.db --nodes=Restaurant=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\restaurants.csv --nodes=Ambience=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\ambiences.csv --nodes=Category=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\categories.csv --nodes=User=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\users.csv --nodes=Review=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\reviews.csv --relationships=Friend=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\friendship.csv --relationships=Critics=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\critics.csv --relationships=Wrote=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\wrote.csv --relationships=HasAmbience=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\has_ambience.csv --relationships=HasCategory=D:\Utilisateurs\UPS\Mega_Donnees\projet\csv\has_category.csv --trim-strings=true --force --multiline-fields=true
+
+match (r:Restaurant)-[HasCategory]->(c:Category) where r.name = '8th & Union Kitchen' return c.category_name
+
+match (r:Restaurant)-[HasAmbience]->(a:Ambience) where r.name = '8th & Union Kitchen' return a.ambience_name
+
+match (rew:Review)-[Critics]->(res:Restaurant) where res.name = 'Tokyo Sushi' return rew.text
+
+match (res:Restaurant)<-[c1:Critics]-(rew1:Review)<-[w1:Wrote]-(u1:User)-[Friend]->(u2:User)-[w2:Wrote]->(rew2:Review)-[c2:Critics]->(res:Restaurant) where res.name='Tokyo Sushi' return distinct u1.name,u2.name
+
+MATCH (u:User)-[f:Friend]->(u1:User)
+RETURN u.name, COUNT(f)
+ORDER BY COUNT(f) DESC
+LIMIT 1
+
+MATCH (u:User)-[f:Friend]->(u1:User)
+RETURN u, COUNT(f)
+ORDER BY COUNT(f) DESC
+LIMIT 1
+
+MATCH (u:User)-[f:Friend]->(u1:User)
+RETURN u, COUNT(f)
+ORDER BY COUNT(f) DESC
+LIMIT 1
+
+match (a:Ambience)<-[h:HasAmbience]-(res:Restaurant)<-[c:Critics]-(rew:Review)<-[w:Wrote]-(u:User)
+-[Friend]->(u1:User)-[w1:Wrote]->(rew1:Review)-[c1:Critics]->(res1:Restaurant)-[h1:HasAmbience]->(a:Ambience) where res1.name = 'Tokyo Sushi' return distinct u
+
+resto aimes par chaaque personne
+match (u:User)-[w:Wrote]->(rew:Review)-[c:Critics]->(res:Restaurant) where toInteger(rew.stars)>=4 with u,collect(distinct res.name) as couples return id(u),couples as results
